@@ -2,13 +2,16 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:market_list/models/Item.dart';
+import 'package:market_list/ui/addItem.dart';
+
 class ListScreen extends StatefulWidget {
   @override
   State<ListScreen> createState() => _ListScreenState();
 }
 
 class _ListScreenState extends State<ListScreen> {
-  List<String> items = ['Teste'];
+  List<Item> items = [];
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +25,43 @@ class _ListScreenState extends State<ListScreen> {
         separatorBuilder: (context, index) => Divider(color: Colors.blueGrey),
         itemCount: items.length,
         itemBuilder: (context, index) {
+          final item = items[index];
+
           return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.blueGrey,
-              child: IconTheme(
-                data: IconThemeData(color: Colors.white),
-                child: Icon(Icons.done),
+              leading: CircleAvatar(
+                backgroundColor: Colors.blueGrey,
+                child: IconTheme(
+                  data: IconThemeData(color: Colors.white),
+                  child: Icon(item.isDone ? Icons.done_all : Icons.done),
+                ),
               ),
-            ),
-            title: Text(
-              items[index],
-              style: TextStyle(color: Colors.blueGrey),
-            ),
-          );
+              title: Text(
+                item.title,
+                style: TextStyle(color: Colors.blueGrey),
+              ),
+              onTap: () {
+                setState(() {
+                  items[index].isDone = !items[index].isDone;
+                });
+              });
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addItem,
+        backgroundColor: Colors.blueGrey,
+        child: Icon(Icons.add),
+      ),
     );
+  }
+
+  void _addItem() async {
+    final item = await showDialog<Item>(
+        context: context,
+        builder: (BuildContext context) {
+          return AddItem();
+        });
+    setState(() {
+      items.add(item!);
+    });
   }
 }
